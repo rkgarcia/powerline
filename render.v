@@ -24,17 +24,18 @@ struct Shell {
 }
 
 const shells = {
-	'bash':  Shell{
+	'bash':       Shell{
 		open:  '\x01'
 		close: '\x02'
 	}
-	'zsh':   Shell{
+	'zsh':        Shell{
 		open:           '%{'
 		close:          '%}'
 		escape_percent: true
 	}
-	'fish':  Shell{}
-	'plain': Shell{}
+	'fish':       Shell{}
+	'powershell': Shell{}
+	'plain':      Shell{}
 }
 
 fn (sh Shell) color(code string) string {

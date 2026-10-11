@@ -70,6 +70,33 @@ fn test_dir_keep_first() {
 	assert dir_text('/usr/share/fonts/truetype', '/home/me', chevron) == '/ > usr > ... > truetype'
 }
 
+fn test_dir_windows_drive() {
+	cfg :=
+		parse_config('[dir]\nseparator = "/"\nhome_symbol = "~"\nmax_depth = 2\nkeep_first = 0\ntruncation = "..."\n')
+	assert dir_text('C:/', 'C:/Users/me', cfg) == 'C:'
+	assert dir_text('C:/src', 'C:/Users/me', cfg) == 'C:/src'
+	// The drive counts as a path component, so shortening can drop it.
+	assert dir_text('C:/src/app', 'C:/Users/me', cfg) == '.../src/app'
+	assert dir_text('C:/Users/me', 'C:/Users/me', cfg) == '~'
+	assert dir_text('C:/Users/me/src', 'C:/Users/me', cfg) == '~/src'
+
+	chevron := parse_config('[dir]\nseparator = " > "\nhome_symbol = "~"\n')
+	assert dir_text('D:/src/app', 'C:/Users/me', chevron) == 'D: > src > app'
+}
+
+fn test_powershell() {
+	seg := Segment{
+		text: 'a%b'
+		fg:   1
+		bg:   2
+	}
+	assert render([seg], '>', shells['powershell']) == render([seg], '>', shells['plain'])
+
+	script := init_script('powershell')!
+	assert script.contains("' prompt powershell")
+	assert script.contains('\$env:PWD = \$PWD.ProviderPath')
+}
+
 fn test_dir_separator_color() {
 	cfg :=
 		parse_config('[dir]\nfg = 7\nseparator = "/"\nseparator_fg = 9\nhome_symbol = "\uf015 "\n')

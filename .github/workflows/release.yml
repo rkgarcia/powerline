@@ -16,6 +16,10 @@ jobs:
   build:
     name: Build ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        # Also on Windows, where the default would be PowerShell.
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
@@ -30,6 +34,12 @@ jobs:
           - target: macos-arm64
             runner: macos-latest
             v_asset: v_macos_arm64
+          # -prod builds with MinGW gcc there; -static keeps its runtime DLLs
+          # out of the picture.
+          - target: windows-x86_64
+            runner: windows-latest
+            v_asset: v_windows
+            v_flags: -cflags -static
     steps:
       - uses: actions/checkout@v7
 
@@ -47,7 +57,7 @@ jobs:
         run: v test .
 
       - name: Build
-        run: v -prod -o powerline .
+        run: v -prod ${{ matrix.v_flags }} -o powerline .
 
       - name: Smoke test
         run: |
@@ -58,13 +68,21 @@ jobs:
         run: |
           name="powerline-${GITHUB_REF_NAME}-${{ matrix.target }}"
           mkdir "$name"
-          cp powerline README.md default.toml "$name/"
-          tar -czf "$name.tar.gz" "$name"
+          cp README.md default.toml "$name/"
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            cp powerline.exe "$name/"
+            7z a "$name.zip" "$name"
+          else
+            cp powerline "$name/"
+            tar -czf "$name.tar.gz" "$name"
+          fi
 
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.target }}
-          path: powerline-*.tar.gz
+          path: |
+            powerline-*.tar.gz
+            powerline-*.zip
           if-no-files-found: error
 
   release:
@@ -81,7 +99,7 @@ jobs:
 
       - name: Checksums
         working-directory: dist
-        run: sha256sum powerline-*.tar.gz > SHA256SUMS
+        run: sha256sum powerline-* > SHA256SUMS
 
       - name: Create release
         env:

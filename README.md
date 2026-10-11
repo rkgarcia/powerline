@@ -22,6 +22,15 @@ eval "$(/path/to/powerline init bash)"
 
 `init zsh` and `init fish` are also available (`powerline init fish | source`).
 
+For PowerShell (on Windows, Linux or macOS), add to your `$PROFILE`:
+
+```powershell
+& 'C:\path\to\powerline.exe' init powershell | Out-String | Invoke-Expression
+```
+
+On Windows an Administrator session is not detected, so it looks like a normal
+one, and the config file is `%USERPROFILE%\.config\powerline\config.toml`.
+
 ## Configure
 
 ```sh

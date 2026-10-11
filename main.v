@@ -4,9 +4,9 @@ import os
 import time
 
 const usage = 'Usage:
-  powerline prompt [bash|zsh|fish|plain]   print the prompt (default: plain)
-  powerline init <bash|zsh|fish>           print shell setup code
-  powerline config                         print the default configuration'
+  powerline prompt [bash|zsh|fish|powershell|plain]   print the prompt (default: plain)
+  powerline init <bash|zsh|fish|powershell>           print shell setup code
+  powerline config                                    print the default configuration'
 
 fn main() {
 	args := os.args[1..]
@@ -41,7 +41,7 @@ fn fail(msg string) {
 }
 
 fn build_segments(cfg Config) []Segment {
-	is_root := os.getuid() == 0
+	is_root := running_as_root()
 	// $PWD keeps the path the user typed (through symlinks); getwd resolves it.
 	cwd := os.getenv_opt('PWD') or { os.getwd() }
 	mut segments := []Segment{}
@@ -67,7 +67,7 @@ fn build_segments(cfg Config) []Segment {
 			}
 			'dir' {
 				segments << Segment{
-					spans: dir_spans(cwd, os.home_dir(), cfg)
+					spans: dir_spans(display_path(cwd), display_path(os.home_dir()), cfg)
 					fg:    cfg.dir_fg
 					bg:    cfg.dir_bg
 				}
@@ -118,8 +118,9 @@ fn dir_spans(cwd string, home string, cfg Config) []Span {
 	truncated := cfg.dir_max_depth > 0 && parts.len > keep_first + cfg.dir_max_depth
 	// The path is shown from the root unless its beginning was cut off. With
 	// "/" an absolute path starts with the separator; any other separator
-	// needs the root spelled out as its own item.
-	at_root := !in_home && (!truncated || keep_first > 0)
+	// needs the root spelled out as its own item. A Windows path (C:/src) has
+	// no root to show: it starts with its drive.
+	at_root := !in_home && cwd.starts_with('/') && (!truncated || keep_first > 0)
 
 	// The home symbol is its own item so that shortening never removes it.
 	mut items := []string{}
@@ -176,6 +177,22 @@ PROMPT=\'\${__powerline_ps1}\'
 			'function fish_prompt
     ${exe} prompt fish
 end
+'
+		}
+		'powershell' {
+			ps_exe := "'" + os.executable().replace("'", "''") + "'"
+			// PowerShell never updates \$env:PWD, and Windows PowerShell decodes
+			// program output with the legacy code page unless told otherwise.
+			'function global:prompt {
+    \$code = \$global:LASTEXITCODE
+    \$env:PWD = \$PWD.ProviderPath
+    \$enc = [Console]::OutputEncoding
+    [Console]::OutputEncoding = [Text.Encoding]::UTF8
+    try { & ${ps_exe} prompt powershell } finally {
+        [Console]::OutputEncoding = \$enc
+        \$global:LASTEXITCODE = \$code
+    }
+}
 '
 		}
 		else {
