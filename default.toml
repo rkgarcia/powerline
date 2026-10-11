@@ -1,0 +1,60 @@
+# powerline configuration
+# Copy to ~/.config/powerline/config.toml and edit. Any key you leave out
+# keeps the default shown here.
+#
+# Colors are 256-color palette indexes (0-255).
+
+# Segments to draw, in order. Remove one to hide it.
+segments = ["time", "user", "dir", "git", "prompt"]
+
+# Glyph drawn between segments (needs a Powerline / Nerd font).
+separator = "\ue0b0"
+
+[user]
+show_user = true
+show_host = true
+fg = 15
+bg = 31
+# Colors used instead when running as root.
+root_fg = 15
+root_bg = 124
+
+[dir]
+fg = 252
+bg = 238
+# Drawn between folders. For a powerline look use " \ue0b1 " (with the spaces).
+separator = " \ue0b0 "
+# Color of the separator; it is drawn on the same background as the folders.
+separator_fg = 245
+# Shown in place of $HOME (a Nerd font house). Use "~", or "" to show the full path.
+# The trailing space matters for icons: terminals shrink an icon to one cell
+# when another character follows it directly.
+home_symbol = "\uf015 "
+# Keep only the last N path components (0 = never shorten). The home symbol
+# is always kept and does not count.
+max_depth = 3
+# When shortening, also keep the first N components after the root or home.
+# keep_first = 1 with max_depth = 1 shows only the first and the last folder.
+keep_first = 0
+# Shown in place of the components that were cut off.
+truncation = "···"
+
+[git]
+fg = 0
+bg = 148
+icon = "\ue0a0"
+
+[prompt]
+user_symbol = "$"
+root_symbol = "#"
+fg = 15
+bg = 236
+root_fg = 15
+root_bg = 160
+
+[time]
+# HH 24h hour, hh 12h hour, mm minutes, ss seconds, A AM/PM, e.g. "hh:mm A"
+format = "HH:mm"
+icon = "\uf017"
+fg = 252
+bg = 238
