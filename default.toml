@@ -8,7 +8,7 @@
 segments = ["time", "user", "dir", "git", "prompt"]
 
 # Glyph drawn between segments (needs a Powerline / Nerd font).
-separator = "\ue0b0"
+separator = "\ue0c6"
 
 [user]
 show_user = true
@@ -23,9 +23,9 @@ root_bg = 124
 fg = 252
 bg = 238
 # Drawn between folders. For a powerline look use " \ue0b1 " (with the spaces).
-separator = " \ue0b0 "
+separator = "\ue0c1 "
 # Color of the separator; it is drawn on the same background as the folders.
-separator_fg = 245
+separator_fg = 244
 # Shown in place of $HOME (a Nerd font house). Use "~", or "" to show the full path.
 # The trailing space matters for icons: terminals shrink an icon to one cell
 # when another character follows it directly.
