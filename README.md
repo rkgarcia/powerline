@@ -5,6 +5,8 @@ A small powerline-style shell prompt written in [V](https://vlang.io).
 Shows the time, `user@host`, the current directory, the git branch, and `$` (or `#` for
 root). Needs a Powerline or Nerd font for the separator glyphs.
 
+![Default](./screenshots/default.png)
+
 ## Build
 
 ```sh
