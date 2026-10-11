@@ -23,16 +23,25 @@ jobs:
           # The oldest available Ubuntu, so the binaries run on older glibc too.
           - target: linux-x86_64
             runner: ubuntu-22.04
+            v_asset: v_linux
           - target: linux-aarch64
             runner: ubuntu-22.04-arm
+            v_asset: v_linux_arm64
           - target: macos-arm64
             runner: macos-latest
+            v_asset: v_macos_arm64
     steps:
       - uses: actions/checkout@v7
 
-      - uses: vlang/setup-v@v1.7
-        with:
-          version: ${{ env.V_VERSION }}
+      # The prebuilt release: building a pinned V from source breaks whenever
+      # the upstream bootstrap compiler moves ahead of that version.
+      - name: Install V
+        run: |
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/v.zip" \
+            "https://github.com/vlang/v/releases/download/$V_VERSION/${{ matrix.v_asset }}.zip"
+          unzip -q "$RUNNER_TEMP/v.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/v" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/v/v" version
 
       - name: Test
         run: v test .

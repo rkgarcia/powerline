@@ -8,7 +8,7 @@ fn test_defaults() {
 	assert cfg.show_host
 	assert cfg.user_symbol == '$'
 	assert cfg.root_symbol == '#'
-	assert cfg.separator == ''
+	assert cfg.separator == '\ue0c6'
 }
 
 fn test_user_config_overrides_only_what_it_sets() {
