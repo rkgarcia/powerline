@@ -137,6 +137,13 @@ fn test_git_branch() {
 	assert git_branch(tree) == 'main'
 
 	assert git_branch(root) == ''
+	// Walking up from C:\x ends at "C:", whose parent os.dir reports as ".".
+	// That must not be taken for the working directory, which may be a repo.
+	wd := os.getwd()
+	os.chdir(repo)!
+	branch := git_branch('C:')
+	os.chdir(wd)!
+	assert branch == ''
 }
 
 fn test_render() {

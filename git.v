@@ -13,7 +13,8 @@ fn git_branch(start string) string {
 			return read_head(dotgit)
 		}
 		parent := os.dir(dir)
-		if parent == dir {
+		// os.dir gives "." for a path without a separator, such as "C:".
+		if parent == dir || parent == '.' {
 			return ''
 		}
 		dir = parent
